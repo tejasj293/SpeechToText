@@ -1,6 +1,7 @@
 package com.example.tejasjoshi.speechtotext;
 
 import android.Manifest;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -35,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         final EditText editText = findViewById(R.id.editText);
 
         nSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+
+        checkSpeechRecognizer();
 
         nSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         nSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -102,12 +106,12 @@ public class MainActivity extends AppCompatActivity {
 
                     case MotionEvent.ACTION_UP:
                         nSpeechRecognizer.stopListening();
-                        editText.setText("You will see the input here");
+                        editText.setHint("You will see the input here");
                         break;
 
                     case MotionEvent.ACTION_DOWN:
-                        editText.setText("");
-                        editText.setText("Listening....");
+                        editText.setHint("");
+                        editText.setHint("Listening....");
                         nSpeechRecognizer.startListening(nSpeechRecognizerIntent);
                         break;
 
@@ -129,4 +133,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    private void checkSpeechRecognizer () {
+
+        Boolean b = SpeechRecognizer.isRecognitionAvailable(this);
+
+        if (b == false) {
+            Toast.makeText(this, "SPEECH RECOGNITION NOT AVAILABLE ON DEVICE", Toast.LENGTH_SHORT).show();
+            nSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this, ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"));
+            // CREATE INTENT FOR GOOGLE PLAY STORE
+//            Intent playStoreIntent = new Intent(android.content.Intent.ACTION_VIEW);
+//            playStoreIntent.setData(Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName()));
+
+        }
+
+    }
+
 }
