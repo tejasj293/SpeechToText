@@ -9,4 +9,4 @@ https://proandroiddev.com/modular-way-of-building-android-apps-500ac816825
 
 https://medium.com/mindorks/multiple-application-modules-in-one-android-project-36e86ceb8a9
 
-https://developer.android.com/training/basics/fragments/creating
+https://guides.codepath.com/android/creating-and-using-fragments
