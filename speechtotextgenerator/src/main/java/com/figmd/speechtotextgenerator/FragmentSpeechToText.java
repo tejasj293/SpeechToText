@@ -1,16 +1,6 @@
 package com.figmd.speechtotextgenerator;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.Manifest;
-import android.app.Activity;
-import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,38 +11,39 @@ import android.provider.Settings;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class FragmentSpeechToText extends Fragment {
 
     SpeechRecognizer nSpeechRecognizer;
     Intent nSpeechRecognizerIntent;
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+
+        return inflater.inflate(R.layout.fragment_speechtotext, parent, false);
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.replace(R.id.fragmentFrameLayout, new FragmentSpeechToText());
-        transaction.commit();
+    public void onViewCreated(View view, Bundle savedInstanceState) {
 
         checkPermission();
 
-        final EditText editText = findViewById(R.id.editText);
+        final EditText editText = view.findViewById(R.id.editText);
 
-        nSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        nSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(getActivity());
 
         checkSpeechRecognizer();
 
@@ -112,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ImageButton button = findViewById(R.id.button);
+        ImageButton button = view.findViewById(R.id.button);
 
         button.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -137,20 +128,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        if (editText.getText() != null) {
-//
-//            ClipboardManager clipboardManager = (ClipboardManager) getSystemService(editText.getContext().CLIPBOARD_SERVICE);
-//
-//        }
     }
 
     private void checkPermission () {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
-                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()));
+            if (!(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getActivity().getPackageName()));
                 startActivity(intent);
-                finish();
+                getActivity().finish();
             }
         }
 
@@ -158,13 +144,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkSpeechRecognizer () {
 
-        Boolean b = SpeechRecognizer.isRecognitionAvailable(this);
+        Boolean b = SpeechRecognizer.isRecognitionAvailable(this.getContext());
 
         if (b == false) {
-            Toast.makeText(this, "SPEECH RECOGNITION NOT AVAILABLE ON DEVICE", Toast.LENGTH_SHORT).show();
-            nSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this, ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"));
+            Toast.makeText(getActivity(), "SPEECH RECOGNITION NOT AVAILABLE ON DEVICE", Toast.LENGTH_SHORT).show();
+            nSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(getActivity(), ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"));
         }
     }
 
 }
-
